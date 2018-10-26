@@ -1,0 +1,24 @@
+Panel dataset:
+-Stocks are indexed by permno and date.
+-Make sure data are sorted (ascending) by permno and date. - ?order
+-Merge F-F5 factors and ME breakpoints. - ?merge
+-Create vector of return and other relevant variables.
+    Brute force. - for loop indexing permno and date
+    Smart. - R packages: dplyr, data.table
+-Create tags for missing values - ?is.na
+-Other useful functions: ?quantile, ?cumprod, ?cumsum
+
+Dynamic trading strategy:
+    Decile (and hence portfolio) composition changes at each month.
+    Bear in mind when analysing strategies and reporting the average number of
+    stocks within each decile
+    
+Wait and trade:
+-Note there is delay between the signal and actual trade.
+-Skip the previous month in the formation of the strategy.
+
+When analysing strategies in R:
+-It might be easier to `transpose' the dataset in order to have strategies as
+columns and dates as rows - ?reshape
+-Some R utilities might require variables to be transformed in time-series - can
+be done with packages: xts, zoo
