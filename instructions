@@ -1,1 +1,18 @@
-
+Portfolio construction:
+1. Create two subsamples using the top 50% ME and bottom 50% ME stocks.
+    For each subsample.
+          a. Use J = 12 months formation period to create decile portfolios.
+          b. Buy `winners' portfolio and sell `losers' one and hold position for K = 1 month.
+          c. Roll the window by 1 month and repeat 1 and 2 until end of sample.
+          
+Trading strategies:
+At beginning of each month from Jan 1991 to Dec 2014
+1. Remove stocks with at least one missing price in the past J = 12 months.
+2. Sort the remaining stocks (ascending) by their return over the past J = 12
+months.
+3. Group them by decile and create 10 equally weighted portfolios.
+4. Buy bottom decile (winners) portfolio and sell top decile (losers) portfolio.
+5. Hold position for K = 1 month and close position of previous month.
+Every month you completely rebalance your portfolio by closing the strategy
+formed the previous month and opening the newly formed one.
+6. Repeat steps 1-5.
