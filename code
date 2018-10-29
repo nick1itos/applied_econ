@@ -1,1 +1,17 @@
 #Team 1: Charles, Even, Muskan, Nick
+#Activating quantmod and xts packages
+library(quantmod)
+library(xts)
+
+#Additional data: stock returns, MYSE ME breakpoints, Fama-French 5 factors
+#Denotation: J - period in months, K - holding period in months
+
+#Step 1: Portfolio construction
+
+#Create two subsamples using top and bottom 50% ME
+
+#Use J=12 months formation period to create decile portfolios
+
+#Buy winners and sell loosers, hold for K=1 months
+
+#Roll the window by 1 month and repeat
