@@ -1,7 +1,21 @@
 #Team 1: Charles, Even, Muskan, Nick
-#Activating quantmod and xts packages (have to be pre-installed using instal.packages('') function)
+
+#Load 
+#Activating required packages (have to be pre-installed using instal.packages('') function)
 library(quantmod)
 library(xts)
+library(zoo)
+
+#Looping throw each row to remove missing values
+data1 <- data[rowSums(is.na(data)) == 0,]
+
+
+
+#Loading ME breakpoints
+me_breakpoints <- read.csv("/Users/nick/Desktop/appliedecon/CW/me_breakpoints.csv")
+
+#Merging ME breakpoints and data1
+
 
 #Additional data: stock returns, MYSE ME breakpoints, Fama-French 5 factors
 
