@@ -1,9 +1,10 @@
 #Team 1: Charles, Even, Muskan, Nick
-#Activating quantmod and xts packages
+#Activating quantmod and xts packages (have to be pre-installed using instal.packages('') function)
 library(quantmod)
 library(xts)
 
 #Additional data: stock returns, MYSE ME breakpoints, Fama-French 5 factors
+
 #Denotation: J - period in months, K - holding period in months
 
 #Step 1: Portfolio construction
