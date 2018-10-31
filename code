@@ -9,15 +9,35 @@ library(zoo)
 #Looping throw each row to remove missing values
 data1 <- data[rowSums(is.na(data)) == 0,]
 
-
+#Aggregate each stock by month
+data2 <- aggregate(data1[,c(4,5)], by = list(Date = as.yearmon(data1$date), Permno = data1$permno), mean)
 
 #Loading ME breakpoints
 me_breakpoints <- read.csv("/Users/nick/Desktop/appliedecon/CW/me_breakpoints.csv")
 
-#Merging ME breakpoints and data1
+#Converting characters into a date in two steps
 
+me_breakpoints$X192512 <- as.character(me_breakpoints$X192512)
+me_breakpoints$X192512 <- as.yearmon(me_breakpoints$X192512, format =  "%Y%m")
 
-#Additional data: stock returns, MYSE ME breakpoints, Fama-French 5 factors
+#Cutting relevants dates
+relevant_dates <- me_breakpoints[769:1068, c(1,12)]
+colnames(relevant_dates) <- c("Date", "ME NYSE Breakpoints")
+relevant_dates$`ME NYSE Breakpoints` <- relevant_dates[,2] * 1000000
+
+#Merging ME breakpoints and data2
+data3 <- merge(data2, relevant_dates, by = "Date")
+
+top50portfolio = c()
+bottom50portfolio = c()
+
+for (row in 1:nrow(data3)) {
+  if (data3$cap > data3$`ME NYSE Breakpoints`) {
+    append(top50portfolio, data3$Permno)
+  } else {
+    append(bottom50portfolio, data3$Permno)
+  }
+}
 
 #Denotation: J - period in months, K - holding period in months
 
