@@ -5,6 +5,7 @@
 library(quantmod)
 library(xts)
 library(zoo)
+library(PerformanceAnalytics)
 
 #Looping throw each row to remove missing values
 data1 <- data[rowSums(is.na(data)) == 0,]
@@ -31,13 +32,17 @@ data3 <- merge(data2, relevant_dates, by = "Date")
 top50portfolio = c()
 bottom50portfolio = c()
 
+data3 <- data3[order(data3$Permno),]
+data3_xts <- xts(data3[,2:5], order.by = as.Date(data3[,1]))
+
 for (row in 1:nrow(data3)) {
-  if (data3$cap > data3$`ME NYSE Breakpoints`) {
-    append(top50portfolio, data3$Permno)
-  } else {
-    append(bottom50portfolio, data3$Permno)
+  id <- data3[row, "Permno"]
+  
+  if (id == 10001) {
+    print(data3[row, ])
   }
 }
+
 
 #Denotation: J - period in months, K - holding period in months
 
