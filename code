@@ -36,10 +36,11 @@ data3 <- data3[order(data3$Permno),]
 data3_xts <- xts(data3[,2:5], order.by = as.Date(data3[,1]))
 
 for (row in 1:nrow(data3)) {
-  id <- data3[row, "Permno"]
-  
-  if (id == 10001) {
-    print(data3[row, ])
+  if (data3[row, "Permno"] == data3[row+1, "Permno" ]) {
+    print(data3[row, "Permno"])
+  } else {
+    print('This is last day of this stock')
+    print(data3[row,])
   }
 }
 
@@ -55,3 +56,4 @@ for (row in 1:nrow(data3)) {
 #Buy winners and sell loosers, hold for K=1 months
 
 #Roll the window by 1 month and repeat
+
