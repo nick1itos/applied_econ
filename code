@@ -6,6 +6,7 @@ library(quantmod)
 library(xts)
 library(zoo)
 library(PerformanceAnalytics)
+library(dplyr)
 
 #Looping throw each row to remove missing values
 data1 <- data[rowSums(is.na(data)) == 0,]
@@ -33,16 +34,12 @@ top50portfolio = c()
 bottom50portfolio = c()
 
 data3 <- data3[order(data3$Permno),]
-data3_xts <- xts(data3[,2:5], order.by = as.Date(data3[,1]))
+data3["Returns"] <- NA
 
-for (row in 1:nrow(data3)) {
-  if (data3[row, "Permno"] == data3[row+1, "Permno" ]) {
-    print(data3[row, "Permno"])
-  } else {
-    print('This is last day of this stock')
-    print(data3[row,])
-  }
-}
+#data3_xts <- xts(data3[,2:5], order.by = as.Date(data3[,1], format = '%b %Y'))
+
+
+returns_xts <- CalculateReturns(data3_xts)
 
 
 #Denotation: J - period in months, K - holding period in months
@@ -56,4 +53,3 @@ for (row in 1:nrow(data3)) {
 #Buy winners and sell loosers, hold for K=1 months
 
 #Roll the window by 1 month and repeat
-
