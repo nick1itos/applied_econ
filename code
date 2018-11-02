@@ -38,6 +38,12 @@ data3 <- data3[order(data3$Permno),]
 
 data3["Returns"] <- NA
 
+top50portfolio = data.frame()
+bottom50portfolio = data.frame()
+
+for (row in 1)
+
+
 for (row in 2:nrow(data3)) {
   if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
     data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
@@ -45,6 +51,9 @@ for (row in 2:nrow(data3)) {
     next
   }
 }
+
+
+
 
 
 
