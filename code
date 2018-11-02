@@ -35,9 +35,8 @@ data3 <- merge(data2, relevant_dates, by = "Date")
 #bottom50portfolio = c()
 
 data3 <- data3[order(data3$Permno),]
-?for (variable in vector) {
-  
-}
+
+data3["Returns"] <- NA
 
 for (row in 2:nrow(data3)) {
   if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
@@ -47,7 +46,7 @@ for (row in 2:nrow(data3)) {
   }
 }
 
-data3["Returns"] <- NA
+
 
 #Denotation: J - period in months, K - holding period in months
 
