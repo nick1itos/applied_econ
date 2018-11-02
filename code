@@ -11,11 +11,12 @@ library(dplyr)
 #Looping throw each row to remove missing values
 data1 <- data[rowSums(is.na(data)) == 0,]
 
+memory.limit(size=16384)
 #Aggregate each stock by month
 data2 <- aggregate(data1[,c(4,5)], by = list(Date = as.yearmon(data1$date), Permno = data1$permno), mean)
 
 #Loading ME breakpoints
-me_breakpoints <- read.csv("/Users/nick/Desktop/appliedecon/CW/me_breakpoints.csv")
+me_breakpoints <- read.csv('ME_Breakpoints.csv')
 
 #Converting characters into a date in two steps
 
@@ -30,17 +31,23 @@ relevant_dates$`ME NYSE Breakpoints` <- relevant_dates[,2] * 1000000
 #Merging ME breakpoints and data2
 data3 <- merge(data2, relevant_dates, by = "Date")
 
-top50portfolio = c()
-bottom50portfolio = c()
+#top50portfolio = c()
+#bottom50portfolio = c()
 
 data3 <- data3[order(data3$Permno),]
+?for (variable in vector) {
+  
+}
+
+for (row in 2:nrow(data3)) {
+  if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
+    data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
+  } else {
+    next
+  }
+}
+
 data3["Returns"] <- NA
-
-#data3_xts <- xts(data3[,2:5], order.by = as.Date(data3[,1], format = '%b %Y'))
-
-
-returns_xts <- CalculateReturns(data3_xts)
-
 
 #Denotation: J - period in months, K - holding period in months
 
