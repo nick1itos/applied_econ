@@ -2,6 +2,7 @@
 library(xts)
 library(zoo)
 library(dplyr)
+library(IDPmisc)
 
 #1transforming data to monthly frequency using last day of month
 monthlydata <- aggregate(data, by = list(as.yearmon(data$date), permno = data$permno), FUN = tail, n=1)
@@ -34,22 +35,25 @@ mergeddata_tbl <- mergeddata %>%
   arrange(permno,Date) %>%
   mutate(return = ((price/lag(price,1))-1))
 
-cleared_data = subset(mergeddata_tbl, select = -c(permno.1, returns, cumreturns))
+#Remove redundant columns
+data2 = subset(mergeddata_tbl, select = -c(permno.1, returns, cumreturns))
 
 #Finding cumulative returns
-cleared_data_tbl <- cleared_data %>%
+data2_tbl <- data2 %>%
   group_by(permno) %>%
   arrange(permno,Date) %>%
   mutate(cumreturn = (price/lag(price,12))-1)
 
-#Remove missing values
-cleaned_data <- cleared_data_tbl[rowSums(is.na(cleared_data_tbl)) == 0,]
+#Remove missing, NA, infinite numbers
+data_no_zeros = subset(data2_tbl, price >= 0)
+data_no_nas = na.omit(data_no_zeros, cols = price)
+cleaned_data=NaRV.omit(data_no_nas)
 
-colnames(cleaned_data)[7] = "breakpoints"
-
+#Creating top and bottom portfolios, filtered by cap in comparison to me breakpoints
 top50portfolio <- subset(cleaned_data, cap>=breakpoints, select = c(1:9) )
 bottom50portfolio <- subset(cleaned_data, cap<breakpoints, select = c(1:9) )
 
+#Order portfolios by date and cum return
 top50portfolio_tbl <- top50portfolio %>%
   group_by(Date) %>%
    arrange(Date, cumreturn, permno)
@@ -60,16 +64,18 @@ bottom50portfolio_tbl <- bottom50portfolio %>%
 
 
 
-
-blablabla <- tally(group_by(top50portfolio_tbl, Date))
-blablabla2 <- tally(group_by(bottom50portfolio_tbl, Date))
-
-
+#Cluster portfolios by month and number of observations within each month
+output_top <- tally(group_by(top50portfolio_tbl, Date))
+output_bottom <- tally(group_by(bottom50portfolio_tbl, Date))
 
 
-blablabla$nstocks <- blablabla$n/10
-blablabla$mean <- mean(blablabla$nstocks)
 
-blablabla2$nstocks <- blablabla2$n/10
-blablabla2$mean <- mean(blablabla2$nstocks)
+#Creating nstocks column to determine number of stocks within each decile, computing average
+output_top$nstocks <- output_top$n/10
+output_top$mean <- mean(output_top$nstocks)
+
+output_bottom$nstocks <- output_bottom$n/10
+output_bottom$mean <- mean(output_bottom$nstocks)
+
+#Mean column represents average number of stocks over the observed period
 
