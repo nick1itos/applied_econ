@@ -41,10 +41,9 @@ mergeddata["returns"] <- NA
 mergeddata["cumreturns"] <- NA
 
 mergeddata_tbl <- mergeddata %>%
-
-group_by(permno) %>%
-arrange(permno,Date) %>%
-mutate(return = price - lag(price,1) / lag(price,1))
+  group_by(permno) %>%
+  arrange(permno,Date) %>%
+  mutate(return = ((price/lag(price,1))-1))
 
 cleared_data = subset(mergeddata_tbl, select = -c(permno.1, returns, cumreturns))
 
@@ -52,17 +51,20 @@ cleared_data = subset(mergeddata_tbl, select = -c(permno.1, returns, cumreturns)
 cleared_data_tbl <- cleared_data %>%
   group_by(permno) %>%
   arrange(permno,Date) %>%
-  mutate(cumreturn = price - lag(price,12) / lag(price,12))
+  mutate(cumreturn = (price/lag(price,12))-1)
 
 #Remove missing values
 cleaned_data <- cleared_data_tbl[rowSums(is.na(cleared_data_tbl)) == 0,]
 
 colnames(cleaned_data)[7] = "breakpoints"
 
+top50portfolio <- subset(cleaned_data, cap>breakpoints, select = c(1:9) )
+bottom50portfolio <- subset(cleaned_data, cap<=breakpoints, select = c(1:9) )
+
 top50portfolio_tbl <- top50portfolio %>%
   group_by(Date) %>%
    arrange(Date, cumreturn, permno)
 
-bottom50portfolio_tbl <- top50portfolio %>%
+bottom50portfolio_tbl <- bottom50portfolio %>%
   group_by(Date) %>%
   arrange(Date, cumreturn, permno)
