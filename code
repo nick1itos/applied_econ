@@ -1,24 +1,13 @@
 #Activating required packages (have to be pre-installed using instal.packages('') function)
-
 library(xts)
 library(zoo)
-library(PerformanceAnalytics)
 library(dplyr)
 
-#data_tbl = tbl_df(data)
-
-#install.packages('lubridate')
-#library(lubdridate)
-
-#data %>% group_by(date = floor_date(date, "month")) %>%
-  #summarize(mean=sum(price))
-
+#1transforming data to monthly frequency using last day of month
 monthlydata <- aggregate(data, by = list(as.yearmon(data$date), permno = data$permno), FUN = tail, n=1)
 
-#1transforming data to monthly frequency using last day of month
-#monthlydata <- aggregate(data[,c(4,5)], by = list(Date = as.yearmon(data$date), Permno = data$permno), mean)
-                      
 #2merge the data with the ME breakpoint file
+
 #Loading ME breakpoints
 me_breakpoints <- read.csv('ME_Breakpoints.csv')
                       
@@ -28,8 +17,8 @@ me_breakpoints$X192512 <- as.yearmon(me_breakpoints$X192512, format = "%Y%m")
                     
 #Cutting relevants dates
 relevant_dates <- me_breakpoints[769:1068, c(1,12)]
-colnames(relevant_dates) <- c("Date", "ME NYSE Breakpoints")
-relevant_dates$`ME NYSE Breakpoints` <- relevant_dates[,2] * 1000000
+colnames(relevant_dates) <- c("Date", "breakpoints")
+relevant_dates$breakpoints <- relevant_dates[,2] * 1000000
 
 colnames(monthlydata)[1] = "Date"
 colnames(relevant_dates)[1] = 'Date'
@@ -58,8 +47,8 @@ cleaned_data <- cleared_data_tbl[rowSums(is.na(cleared_data_tbl)) == 0,]
 
 colnames(cleaned_data)[7] = "breakpoints"
 
-top50portfolio <- subset(cleaned_data, cap>breakpoints, select = c(1:9) )
-bottom50portfolio <- subset(cleaned_data, cap<=breakpoints, select = c(1:9) )
+top50portfolio <- subset(cleaned_data, cap>=breakpoints, select = c(1:9) )
+bottom50portfolio <- subset(cleaned_data, cap<breakpoints, select = c(1:9) )
 
 top50portfolio_tbl <- top50portfolio %>%
   group_by(Date) %>%
@@ -68,3 +57,19 @@ top50portfolio_tbl <- top50portfolio %>%
 bottom50portfolio_tbl <- bottom50portfolio %>%
   group_by(Date) %>%
   arrange(Date, cumreturn, permno)
+
+
+
+
+blablabla <- tally(group_by(top50portfolio_tbl, Date))
+blablabla2 <- tally(group_by(bottom50portfolio_tbl, Date))
+
+
+
+
+blablabla$nstocks <- blablabla$n/10
+blablabla$mean <- mean(blablabla$nstocks)
+
+blablabla2$nstocks <- blablabla2$n/10
+blablabla2$mean <- mean(blablabla2$nstocks)
+
