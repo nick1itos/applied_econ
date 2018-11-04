@@ -1,70 +1,125 @@
-#Team 1: Charles, Even, Muskan, Nick
-
-#Load 
 #Activating required packages (have to be pre-installed using instal.packages('') function)
-library(quantmod)
+
 library(xts)
 library(zoo)
 library(PerformanceAnalytics)
 library(dplyr)
 
-#Looping throw each row to remove missing values
-data1 <- data[rowSums(is.na(data)) == 0,]
+#data_tbl = tbl_df(data)
 
-memory.limit(size=16384)
-#Aggregate each stock by month
-data2 <- aggregate(data1[,c(4,5)], by = list(Date = as.yearmon(data1$date), Permno = data1$permno), mean)
+#install.packages('lubridate')
+#library(lubdridate)
 
+#data %>% group_by(date = floor_date(date, "month")) %>%
+  #summarize(mean=sum(price))
+
+monthlydata <- aggregate(data, by = list(as.yearmon(data$date), permno = data$permno), FUN = tail, n=1)
+
+#1transforming data to monthly frequency using last day of month
+#monthlydata <- aggregate(data[,c(4,5)], by = list(Date = as.yearmon(data$date), Permno = data$permno), mean)
+                      
+#2merge the data with the ME breakpoint file
 #Loading ME breakpoints
 me_breakpoints <- read.csv('ME_Breakpoints.csv')
-
+                      
 #Converting characters into a date in two steps
-
 me_breakpoints$X192512 <- as.character(me_breakpoints$X192512)
-me_breakpoints$X192512 <- as.yearmon(me_breakpoints$X192512, format =  "%Y%m")
-
+me_breakpoints$X192512 <- as.yearmon(me_breakpoints$X192512, format = "%Y%m")
+                    
 #Cutting relevants dates
 relevant_dates <- me_breakpoints[769:1068, c(1,12)]
 colnames(relevant_dates) <- c("Date", "ME NYSE Breakpoints")
 relevant_dates$`ME NYSE Breakpoints` <- relevant_dates[,2] * 1000000
 
-#Merging ME breakpoints and data2
-data3 <- merge(data2, relevant_dates, by = "Date")
+colnames(monthlydata)[1] = "Date"
+colnames(relevant_dates)[1] = 'Date'
 
+#Merging ME breakpoints and data2
+mergeddata <- merge(monthlydata, relevant_dates, by = "Date")
+                      
+mergeddata["returns"] <- NA
+mergeddata["cumreturns"] <- NA
+
+mergeddata_tbl <- mergeddata %>%
+
+group_by(permno) %>%
+arrange(permno,Date) %>%
+mutate(return = price - lag(price,1) / lag(price,1))
+
+cleared_data = subset(mergeddata_tbl, select = -c(permno.1, returns, cumreturns))
+
+
+#Finding cumulative returns
+
+
+
+
+
+
+
+
+#3Calculate new colums of returns and cumulative returns
+                      
+#4remove rows with price=0
+#Looping throw each row to remove missing values
+data1 <- data[rowSums(is.na(data)) == 0,]
+                      
+#split the dataset by 50% ME breakpoint in to subexamples
 #top50portfolio = c()
 #bottom50portfolio = c()
-
-data3 <- data3[order(data3$Permno),]
-
-data3["Returns"] <- NA
-
 top50portfolio = data.frame()
 bottom50portfolio = data.frame()
-
+                      
+                      
 for (row in 1)
-
-
+                      
+                      
+                      
 for (row in 2:nrow(data3)) {
-  if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
-    data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
-  } else {
-    next
+                      
+if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
+                      
+data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
+                      
+} else {
+                      
+next
+                      
+}
+                      
+}
+#Aggregate each stock by month
+data2 <- aggregate(data1[,c(4,5)], by = list(Date = as.yearmon(data1$date), Permno = data1$permno), mean)
+                      
+                      
+                      
+                      
+#top50portfolio = c()
+                      
+#bottom50portfolio = c()
+                  
+data3 <- data3[order(data3$Permno),]
+                      
+                      
+
+                      
+                      
+top50portfolio = data.frame()
+                      
+bottom50portfolio = data.frame()
+                      
+                      
+for (row in 1)
+                      
+                      
+                      
+for (row in 2:nrow(data3)) {
+                      
+if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
+                      
+data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
+                      
+} else {
+  next
   }
 }
-
-
-
-
-
-
-#Denotation: J - period in months, K - holding period in months
-
-#Step 1: Portfolio construction
-
-#Create two subsamples using top and bottom 50% ME
-
-#Use J=12 months formation period to create decile portfolios
-
-#Buy winners and sell loosers, hold for K=1 months
-
-#Roll the window by 1 month and repeat
