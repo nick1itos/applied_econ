@@ -48,78 +48,21 @@ mutate(return = price - lag(price,1) / lag(price,1))
 
 cleared_data = subset(mergeddata_tbl, select = -c(permno.1, returns, cumreturns))
 
-
 #Finding cumulative returns
+cleared_data_tbl <- cleared_data %>%
+  group_by(permno) %>%
+  arrange(permno,Date) %>%
+  mutate(cumreturn = price - lag(price,12) / lag(price,12))
 
+#Remove missing values
+cleaned_data <- cleared_data_tbl[rowSums(is.na(cleared_data_tbl)) == 0,]
 
+colnames(cleaned_data)[7] = "breakpoints"
 
+top50portfolio_tbl <- top50portfolio %>%
+  group_by(Date) %>%
+   arrange(Date, cumreturn, permno)
 
-
-
-
-
-#3Calculate new colums of returns and cumulative returns
-                      
-#4remove rows with price=0
-#Looping throw each row to remove missing values
-data1 <- data[rowSums(is.na(data)) == 0,]
-                      
-#split the dataset by 50% ME breakpoint in to subexamples
-#top50portfolio = c()
-#bottom50portfolio = c()
-top50portfolio = data.frame()
-bottom50portfolio = data.frame()
-                      
-                      
-for (row in 1)
-                      
-                      
-                      
-for (row in 2:nrow(data3)) {
-                      
-if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
-                      
-data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
-                      
-} else {
-                      
-next
-                      
-}
-                      
-}
-#Aggregate each stock by month
-data2 <- aggregate(data1[,c(4,5)], by = list(Date = as.yearmon(data1$date), Permno = data1$permno), mean)
-                      
-                      
-                      
-                      
-#top50portfolio = c()
-                      
-#bottom50portfolio = c()
-                  
-data3 <- data3[order(data3$Permno),]
-                      
-                      
-
-                      
-                      
-top50portfolio = data.frame()
-                      
-bottom50portfolio = data.frame()
-                      
-                      
-for (row in 1)
-                      
-                      
-                      
-for (row in 2:nrow(data3)) {
-                      
-if (data3[row, 'Permno'] == data3[row - 1, 'Permno']) {
-                      
-data3[row, 'Returns'] = 100 * (data3[row, 'price'] - data3[row - 1, 'price'])/data3[row -1, "price"]
-                      
-} else {
-  next
-  }
-}
+bottom50portfolio_tbl <- top50portfolio %>%
+  group_by(Date) %>%
+  arrange(Date, cumreturn, permno)
