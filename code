@@ -78,4 +78,3 @@ output_bottom$nstocks <- output_bottom$n/10
 output_bottom$mean <- mean(output_bottom$nstocks)
 
 #Mean column represents average number of stocks over the observed period
-
